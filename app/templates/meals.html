@@ -1,8 +1,88 @@
 {% extends "base.html" %}
 {% block title %}Browse Meals{% endblock %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
 {% block content %}
+
 <h1>Browse Meals</h1>
+
+<!-- Filters -->
 <div class="card">
-  <p>Dining hall menu items go here.</p>
+  <form method="GET" action="/meals" style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;">
+    <div style="flex:1;min-width:160px;">
+      <label>Dining Hall</label>
+      <select name="dining_hall" onchange="this.form.submit()">
+        <option value="">All Dining Halls</option>
+        {% for hall in dining_halls %}
+          <option value="{{ hall }}" {% if selected_hall == hall %}selected{% endif %}>{{ hall }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:1;min-width:160px;">
+      <label>Meal Type</label>
+      <select name="meal_type" onchange="this.form.submit()">
+        <option value="">All Types</option>
+        {% for mt in meal_types %}
+          <option value="{{ mt }}" {% if selected_type == mt %}selected{% endif %}>{{ mt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <a href="/meals" class="btn btn-primary btn-sm" style="display:inline-block;margin-bottom:.75rem;">Clear</a>
+    </div>
+  </form>
 </div>
+
+<!-- Meal List -->
+<div class="card">
+  {% if items %}
+  <table>
+    <thead>
+      <tr><th>Meal</th><th>Dining Hall</th><th>Type</th><th>Points</th></tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.meal_name }}</td>
+        <td>{{ item.dining_hall }}</td>
+        <td>{{ item.meal_type }}</td>
+        <td>{{ item.point_value }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>No meals found. Upload a CSV in Settings or add one below.</p>
+  {% endif %}
+</div>
+
+<!-- Add Meal Form -->
+<div class="card">
+  <h2>Add a Meal</h2>
+  <form method="POST" action="/meals/add" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+    <div>
+      <label>Meal Name</label>
+      <input type="text" name="meal_name" placeholder="e.g. Cheeseburger" required>
+    </div>
+    <div>
+      <label>Point Value</label>
+      <input type="number" name="point_value" step="0.25" min="0" placeholder="e.g. 7.50" required>
+    </div>
+    <div>
+      <label>Meal Type</label>
+      <input type="text" name="meal_type" placeholder="e.g. Entree, Drink, Snack" required>
+    </div>
+    <div>
+      <label>Dining Hall</label>
+      <input type="text" name="dining_hall" placeholder="e.g. Carson Dining" required>
+    </div>
+    <div style="grid-column:1/-1;">
+      <button type="submit" class="btn btn-primary">Add Meal</button>
+    </div>
+  </form>
+</div>
+
 {% endblock %}
