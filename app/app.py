@@ -1,5 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from db import meal_options_col
+from db import (
+    meal_options_col,
+    add_purchase,
+    get_all_purchases,
+    add_purchase_again,
+    delete_purchase
+)
 import csv
 import io
 
@@ -107,7 +113,33 @@ def meal_upload():
 
 @app.route("/history")
 def history():
-    return render_template("history.html")
+    purchases = get_all_purchases()
+    total_spent = sum(purchase["point_value"] for purchase in purchases)
+
+    return render_template(
+        "history.html",
+        purchases=purchases,
+        total_spent=total_spent
+    )
+
+
+@app.route("/history/add-again/<purchase_id>", methods=["POST"])
+def add_history_item_again(purchase_id):
+    new_purchase_id = add_purchase_again(purchase_id)
+
+    if new_purchase_id is None:
+        flash("Purchase could not be found.", "error")
+    else:
+        flash("Purchase added again with today's date.", "success")
+
+    return redirect(url_for("history"))
+
+
+@app.route("/history/delete/<purchase_id>", methods=["POST"])
+def delete_history_item(purchase_id):
+    delete_purchase(purchase_id)
+    flash("Purchase deleted.", "success")
+    return redirect(url_for("history"))
 
 @app.route("/settings")
 def settings():
