@@ -75,20 +75,46 @@ def meal_upload():
     if not file or file.filename == "":
         flash("No file selected.", "error")
         return redirect(url_for("settings"))
+    if not file.filename.lower().endswith(".csv"):
+        flash("Invalid file type. Please upload a .csv file.", "error")
+        return redirect(url_for("settings"))
 
     stream  = io.StringIO(file.stream.read().decode("utf-8"))
     reader  = csv.DictReader(stream)
+    expected_headers = ["meal_name", "point_value", "meal_type", "dining_hall"]
+    received_headers = [h.strip() for h in (reader.fieldnames or [])]
+
+    if received_headers != expected_headers:
+        flash(
+            "Invalid CSV headers. Required exact order: "
+            "meal_name,point_value,meal_type,dining_hall",
+            "error"
+        )
+        return redirect(url_for("settings"))
+
     added   = 0
     skipped = 0
 
     for row in reader:
         try:
-            meal_name   = row["meal_name"].strip()
-            point_value = float(row["point_value"].strip())
-            meal_type   = row["meal_type"].strip()
-            dining_hall = row["dining_hall"].strip()
+            print(f"row: {row}", flush=True)
+            meal_name   = row.get("meal_name", "")
+            point_value = row.get("point_value", "")
+            meal_type   = row.get("meal_type", "")
+            dining_hall = row.get("dining_hall", "")
 
-            if not meal_name or not dining_hall:
+            if not meal_name or not dining_hall or not point_value or not meal_type:
+                skipped += 1
+                continue
+
+            meal_name = meal_name.strip()
+            point_value = point_value.strip()
+            meal_type = meal_type.strip()
+            dining_hall = dining_hall.strip()
+
+            try:
+                point_value = float(point_value)
+            except ValueError:
                 skipped += 1
                 continue
 
@@ -103,7 +129,8 @@ def meal_upload():
                 upsert=True
             )
             added += 1
-        except (KeyError, ValueError):
+        except Exception as e:
+            print(f"Error: {e}", flush=True)
             skipped += 1
 
     flash(f"Upload complete — {added} meals added/updated, {skipped} rows skipped.", "success")

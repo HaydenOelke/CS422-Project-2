@@ -1,8 +1,67 @@
 {% extends "base.html" %}
 {% block title %}Settings{% endblock %}
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
 <h1>Settings</h1>
+
 <div class="card">
-  <p>Budget settings go here.</p>
+  <h2>Admin Settings</h2>
+  <p>Upload a meal catalog CSV to update the default meal options across all dining halls.</p>
+  <p>Required headers (exact order): <code>meal_name,point_value,meal_type,dining_hall</code></p>
+
+  <form class="upload-form" method="POST" action="{{ url_for('meal_upload') }}" enctype="multipart/form-data" style="display:grid;gap:.75rem;">
+    <div>
+      <label for="csv_file">Meal Catalog CSV</label>
+      <input id="csv_file" name="csv_file" type="file" accept=".csv,text/csv" required>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Upload Meal Catalog</button>
+    </div>
+  </form>
 </div>
+
+<style>
+  h2 {
+    color: #1a3a2a;
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+  }
+
+  .card p {
+    margin-bottom: 1.25rem;
+  }
+
+  .card p:last-of-type {
+    margin-bottom: 1.75rem;
+  }
+
+  .upload-form {
+    margin-top: 0.5rem;
+  }
+
+  code {
+    color: #444;
+    font-size: 0.9rem;
+  }
+
+  input[type="file"] {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    background: white;
+  }
+
+  button.btn {
+    margin-top: 0.25rem;
+  }
+</style>
 {% endblock %}
