@@ -91,3 +91,32 @@ def delete_purchase(purchase_id):
     Deletes a purchase from the purchases collection.
     """
     return purchases_col.delete_one({"_id": ObjectId(purchase_id)})
+
+
+# ── Budget Management ─────────────────────────────
+def set_budget(amount):
+    """
+    Sets or updates the meal points budget (global, single user).
+    """
+    users_col.update_one(
+        {"_id": "budget"},
+        {"$set": {"amount": float(amount)}},
+        upsert=True
+    )
+
+def get_budget():
+    """
+    Gets the current meal points budget (global, single user).
+    """
+    doc = users_col.find_one({"_id": "budget"})
+    return doc["amount"] if doc and "amount" in doc else None
+
+def get_remaining_budget():
+    """
+    Returns the remaining budget (budget - total spent).
+    """
+    budget = get_budget()
+    spent = get_total_spent()
+    if budget is None:
+        return None
+    return budget - spent

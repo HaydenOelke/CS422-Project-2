@@ -3,6 +3,55 @@
 {% block content %}
 <h1>Dashboard</h1>
 <div class="card">
-  <p>Budget overview goes here.</p>
+  <h2>Meal Points Budget</h2>
+  <form method="POST" action="/set-budget" style="margin-bottom:1.2rem;">
+    <label for="budget_amount">Select Meal Plan:</label>
+    <select name="budget_amount" id="budget_amount" required>
+      <option value="95" {% if budget == 95 %}selected{% endif %}>Deluxe: 95 points/week – For students who seldom skip a meal and occasionally treat a friend.</option>
+      <option value="80" {% if budget == 80 %}selected{% endif %}>Standard: 80 points/week – Most popular; enough for meals and snacks throughout the week.</option>
+      <option value="65" {% if budget == 65 %}selected{% endif %}>Select: 65 points/week – For students who might skip breakfast but not lunch or dinner.</option>
+      <option value="50" {% if budget == 50 %}selected{% endif %}>Mini: 50 points/week – For students who eat on the go and are often off campus on weekends.</option>
+      <option value="5" {% if budget == 5 %}selected{% endif %}>Carson-based: 5 points/week – Entry to Carson Dining any time, plus 5 points/week. Most economical for students.</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Save Plan</button>
+  </form>
+  <div>
+    <p><strong>Current Plan Points/Week:</strong> {{ budget if budget is not none else 'Not set' }}</p>
+    <p><strong>Total Points Spent:</strong> {{ total_spent }}</p>
+    <p><strong>Remaining Points:</strong> {{ remaining if remaining is not none else 'N/A' }}</p>
+  </div>
+
+  {% if budget is not none %}
+  <div class="card" style="background:#f8f9fa; margin-top:1.5rem;">
+    <h3>Average Points to Use Per Day</h3>
+    <p>
+      For a 7-day week: <strong>{{ (budget / 7) | round(0) }}</strong> points/day
+    </p>
+    <p style="font-size:.93em; color:#666;">Tip: Try to keep your daily spending near this amount to make your points last all week.</p>
+  </div>
+  {% endif %}
 </div>
+
+<div class="card" style="padding:2rem;">
+    <h2>Tips & Tricks to Stay in Budget</h2>
+    <ul>
+      <li>Points renew every Sunday morning. Plan your week so you don't run out early or have too many left over.</li>
+      <li>Spend your points on any combination of items at any of the 14 dining venues (except Carson-based plan, which is dine-in only at Carson Dining).</li>
+      <li>Sample daily spending for 12 points: <br>
+        <div style="margin-left:1.5rem; color:#555; font-size:.95em;">
+          Breakfast at DUX Bistro—coffee and a bagel with cream cheese—2 points<br>
+          Lunch at Bullseye Taco—pollo asado burrito—4 points<br>
+          Dinner at Fresh! Marketcafé—shrimp scampi with a fountain drink—5 points<br>
+          Add a piece of fruit, milk, or cookies—1 point
+        </div>
+      </li>
+      <li>Choose a plan that fits your eating habits. Deluxe (95), Standard (80), Select (65), and Mini (50) all include $50 Duck Bucks per term. Or Carson-based plan: 
+        Entry to Carson Dining any time, plus 5 points/week and $50 Duck Bucks/term. Most economical for frequent Carson diners.</li>
+      <li>Some dining halls may have limited hours during holidays. <a href="https://housing.uoregon.edu/breaks" target="_blank">See Holidays and Breaks info</a>.</li>
+      <br>
+      <li><strong>Rollover:</strong> Up to 50 unused points roll over each week, but reset at the start of a new term. Rollover points can only be used after using your weekly allotment.</li>
+    </ul>
+    <br>
+    <p>In case you have questions about your point balance, check it on <a href="https://housing.uoregon.edu/myhousing" target="_blank">My Housing</a> or at any dining venue.</p>
+  </div>
 {% endblock %}

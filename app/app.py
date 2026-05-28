@@ -4,7 +4,11 @@ from db import (
     add_purchase,
     get_all_purchases,
     add_purchase_again,
-    delete_purchase
+    delete_purchase,
+    set_budget,
+    get_budget,
+    get_total_spent,
+    get_remaining_budget
 )
 import csv
 import io
@@ -16,7 +20,30 @@ app.secret_key = "mealtrack-dev-secret"
 
 @app.route("/")
 def dashboard():
-    return render_template("dashboard.html")
+    budget = get_budget()
+    total_spent = get_total_spent()
+    remaining = get_remaining_budget()
+    return render_template(
+        "dashboard.html",
+        budget=budget,
+        total_spent=total_spent,
+        remaining=remaining
+    )
+
+
+# ── Budget Form Submission ───────────────────────
+@app.route("/set-budget", methods=["POST"])
+def set_budget_route():
+    amount = request.form.get("budget_amount", "").strip()
+    try:
+        amount = float(amount)
+        if amount < 0:
+            raise ValueError
+        set_budget(amount)
+        flash("Budget updated.", "success")
+    except ValueError:
+        flash("Please enter a valid non-negative number for the budget.", "error")
+    return redirect(url_for("dashboard"))
 
 @app.route("/meals")
 def meals():
