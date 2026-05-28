@@ -94,6 +94,17 @@ def meal_add():
     flash(f"{meal_name} added successfully.", "success")
     return redirect(url_for("meals"))
 
+@app.route("/meals/log", methods=["POST"])
+def meal_log():
+    item_name   = request.form.get("item_name", "").strip()
+    point_cost  = request.form.get("point_cost", "").strip()
+    location    = request.form.get("location", "").strip()
+    meal_type   = request.form.get("meal_type", "").strip()
+
+    add_purchase(item_name, location, float(point_cost), meal_type)
+    flash(f"{item_name} logged to purchase history.", "success")
+    return redirect(url_for("meals"))
+
 # ── CSV Upload (for teammate to hook into settings) ───────────────────────────
 
 @app.route("/meals/upload", methods=["POST"])

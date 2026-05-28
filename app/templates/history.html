@@ -38,9 +38,9 @@
         {% for purchase in purchases %}
           <tr>
             <td>{{ purchase.purchase_date }}</td>
-            <td>{{ purchase.item_name }}</td>
-            <td>{{ purchase.location }}</td>
-            <td>{{ "%.2f"|format(purchase.point_cost) }}</td>
+            <td>{{ purchase.meal_name }}</td>
+            <td>{{ purchase.dining_hall }}</td>
+            <td>{{ "%.2f"|format(purchase.point_value) }}</td>
             <td class="actions">
               <form method="POST" action="/history/add-again/{{ purchase._id }}">
                 <button type="submit">Add Again</button>
