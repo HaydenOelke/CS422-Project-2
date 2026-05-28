@@ -82,11 +82,11 @@ def meal_upload():
     stream  = io.StringIO(file.stream.read().decode("utf-8"))
     reader  = csv.DictReader(stream)
     expected_headers = ["meal_name", "point_value", "meal_type", "dining_hall"]
-    received_headers = [h.strip() for h in (reader.fieldnames or [])]
+    received_headers = [h for h in (reader.fieldnames or [])]
 
     if received_headers != expected_headers:
         flash(
-            "Invalid CSV headers. Required exact order: "
+            "Invalid CSV headers. Required exact order (with no spaces): "
             "meal_name,point_value,meal_type,dining_hall",
             "error"
         )
@@ -97,7 +97,7 @@ def meal_upload():
 
     for row in reader:
         try:
-            print(f"row: {row}", flush=True)
+            # print(f"row: {row}", flush=True)
             meal_name   = row.get("meal_name", "")
             point_value = row.get("point_value", "")
             meal_type   = row.get("meal_type", "")
