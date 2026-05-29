@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Browse Meals{% endblock %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <div class="flash {{ category }}">{{ message }}</div>
-  {% endfor %}
-{% endwith %}
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endwith %}
 
 <h1>Browse Meals</h1>
 
@@ -17,7 +18,7 @@
       <select name="dining_hall" onchange="this.form.submit()">
         <option value="">All Dining Halls</option>
         {% for hall in dining_halls %}
-          <option value="{{ hall }}" {% if selected_hall == hall %}selected{% endif %}>{{ hall }}</option>
+        <option value="{{ hall }}" {% if selected_hall==hall %}selected{% endif %}>{{ hall }}</option>
         {% endfor %}
       </select>
     </div>
@@ -26,7 +27,7 @@
       <select name="meal_type" onchange="this.form.submit()">
         <option value="">All Types</option>
         {% for mt in meal_types %}
-          <option value="{{ mt }}" {% if selected_type == mt %}selected{% endif %}>{{ mt }}</option>
+        <option value="{{ mt }}" {% if selected_type==mt %}selected{% endif %}>{{ mt }}</option>
         {% endfor %}
       </select>
     </div>
@@ -41,30 +42,38 @@
   {% if items %}
   <table>
     <thead>
-  <tr><th>Meal</th><th>Dining Hall</th><th>Type</th><th>Points</th><th></th></tr>
-</thead>
-<tbody>
-  {% for item in items %}
-  <tr>
-    <td>{{ item.meal_name }}</td>
-    <td>{{ item.dining_hall }}</td>
-    <td>{{ item.meal_type }}</td>
-    <td>{{ item.point_value }}</td>
-    <td>
-      <form method="POST" action="/meals/log">
-        <input type="hidden" name="item_name"  value="{{ item.meal_name }}">
-        <input type="hidden" name="point_cost" value="{{ item.point_value }}">
-        <input type="hidden" name="location"   value="{{ item.dining_hall }}">
-        <input type="hidden" name="meal_type"  value="{{ item.meal_type }}">
-      <button type="submit" class="btn btn-primary btn-sm">+ Add</button>
-    </form>
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
+      <tr>
+        <th>Meal</th>
+        <th>Dining Hall</th>
+        <th>Type</th>
+        <th>Points</th>
+        <th>Purchase Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.meal_name }}</td>
+        <td>{{ item.dining_hall }}</td>
+        <td>{{ item.meal_type }}</td>
+        <td>{{ item.point_value }}</td>
+        <td>
+          <form method="POST" action="/meals/log">
+            <input type="hidden" name="item_name" value="{{ item.meal_name }}">
+            <input type="hidden" name="point_cost" value="{{ item.point_value }}">
+            <input type="hidden" name="location" value="{{ item.dining_hall }}">
+            <input type="hidden" name="meal_type" value="{{ item.meal_type }}">
+            <input type="date" name="purchase_date" aria-label="Purchase Date">
+            <button type="submit" class="btn btn-primary btn-sm">+ Add</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
   {% else %}
-    <p>No meals found. Upload a CSV in Settings or add one below.</p>
+  <p>No meals found. Upload a CSV in Settings or add one below.</p>
   {% endif %}
 </div>
 
@@ -93,5 +102,37 @@
     </div>
   </form>
 </div>
+
+<style>
+  /* Match base.html text/number input styling */
+  input[type="date"] {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #222;
+    background: white;
+  }
+
+  /* Date + Add button layout inside each table row */
+  table form {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  table input[type="date"] {
+    width: auto;
+    min-width: 9.5rem;
+    margin-bottom: 0;
+    /* override base full-width form margin */
+  }
+
+  table .btn-sm {
+    white-space: nowrap;
+  }
+</style>
 
 {% endblock %}

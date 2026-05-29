@@ -8,7 +8,13 @@ from db import (
     set_budget,
     get_budget,
     get_total_spent,
-    get_remaining_budget
+    get_total_spent_this_week,
+    get_remaining_budget,
+    check_weekly_reset,
+    get_points_to_spend_before_reset,
+    force_weekly_reset,
+    get_days_left_in_week,
+    get_average_points_per_day
 )
 import csv
 import io
@@ -20,29 +26,52 @@ app.secret_key = "mealtrack-dev-secret"
 
 @app.route("/")
 def dashboard():
+    check_weekly_reset()
+
     budget = get_budget()
-    total_spent = get_total_spent()
+    total_spent = get_total_spent_this_week()
     remaining = get_remaining_budget()
+    points_to_spend = get_points_to_spend_before_reset()
+    days_left = get_days_left_in_week()
+    average_points_per_day = get_average_points_per_day()
+
     return render_template(
         "dashboard.html",
         budget=budget,
         total_spent=total_spent,
-        remaining=remaining
+        remaining=remaining,
+        points_to_spend=points_to_spend,
+        days_left=days_left,
+        average_points_per_day=average_points_per_day
     )
+
+@app.route("/test-reset")
+def test_reset():
+    force_weekly_reset()
+    flash("Weekly reset forced for testing.", "success")
+    return redirect(url_for("dashboard"))
 
 
 # ── Budget Form Submission ───────────────────────
 @app.route("/set-budget", methods=["POST"])
 def set_budget_route():
-    amount = request.form.get("budget_amount", "").strip()
+    plan_name = request.form.get("plan_name", "").strip()
+    current_points = request.form.get("current_points", "").strip()
+    rollover_points = request.form.get("rollover_points", "0").strip()
+
     try:
-        amount = float(amount)
-        if amount < 0:
+        current_points = float(current_points)
+        rollover_points = float(rollover_points)
+
+        if current_points < 0 or rollover_points < 0:
             raise ValueError
-        set_budget(amount)
+
+        set_budget(plan_name, current_points, rollover_points)
         flash("Budget updated.", "success")
+
     except ValueError:
-        flash("Please enter a valid non-negative number for the budget.", "error")
+        flash("Please enter a valid meal plan and non-negative point values.", "error")
+
     return redirect(url_for("dashboard"))
 
 @app.route("/meals")
@@ -91,7 +120,7 @@ def meal_add():
         }},
         upsert=True
     )
-    flash(f"{meal_name} added successfully.", "success")
+    flash(f"'{meal_name}' added to meal options successfully.", "success")
     return redirect(url_for("meals"))
 
 @app.route("/meals/log", methods=["POST"])
@@ -100,9 +129,21 @@ def meal_log():
     point_cost  = request.form.get("point_cost", "").strip()
     location    = request.form.get("location", "").strip()
     meal_type   = request.form.get("meal_type", "").strip()
+    purchase_date = request.form.get("purchase_date", "").strip() or None
 
-    add_purchase(item_name, location, float(point_cost), meal_type)
-    flash(f"{item_name} logged to purchase history.", "success")
+    try:
+        point_cost = float(point_cost)
+    except ValueError:
+        flash("Point cost must be a number.", "error")
+        return redirect(url_for("meals"))
+
+    purchase_id = add_purchase(item_name, location, point_cost, meal_type, purchase_date)
+
+    if purchase_id is None:
+        flash("An Error occured: Please make sure you have saved a budget in the Dashboard and have enough weekly or rollover points to add this meal.", "error")
+        return redirect(url_for("meals"))
+
+    flash(f"'{item_name}' logged to purchase history.", "success")
     return redirect(url_for("meals"))
 
 # ── CSV Upload (for teammate to hook into settings) ───────────────────────────
@@ -193,7 +234,7 @@ def add_history_item_again(purchase_id):
     new_purchase_id = add_purchase_again(purchase_id)
 
     if new_purchase_id is None:
-        flash("Purchase could not be found.", "error")
+        flash("Purchase could not be added again. There may not be enough points.", "error")
     else:
         flash("Purchase added again with today's date.", "success")
 
