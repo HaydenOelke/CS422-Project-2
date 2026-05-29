@@ -82,6 +82,33 @@ def get_total_spent_this_week():
 
     return sum(float(purchase.get("point_value", 0)) for purchase in purchases)
 
+def get_days_left_in_week():
+    """
+    Returns the number of days left before the next Sunday reset.
+    Sunday counts as 7 because the weekly points just reset.
+    """
+    today = date.today()
+
+    # Python weekday: Monday = 0, Sunday = 6
+    days_since_sunday = (today.weekday() + 1) % 7
+    days_left = 7 - days_since_sunday
+
+    return max(days_left, 1)
+
+
+def get_average_points_per_day():
+    """
+    Returns the average number of points available per day
+    based on the days left before Sunday reset.
+    """
+    remaining = get_remaining_budget()
+
+    if remaining is None:
+        return None
+
+    days_left = get_days_left_in_week()
+
+    return round(remaining / days_left)
 
 def get_purchase_by_id(purchase_id):
     """

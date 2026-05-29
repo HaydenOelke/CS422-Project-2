@@ -8,10 +8,13 @@ from db import (
     set_budget,
     get_budget,
     get_total_spent,
+    get_total_spent_this_week,
     get_remaining_budget,
-    get_points_to_spend_before_reset,
     check_weekly_reset,
-    force_weekly_reset
+    get_points_to_spend_before_reset,
+    force_weekly_reset,
+    get_days_left_in_week,
+    get_average_points_per_day
 )
 import csv
 import io
@@ -26,16 +29,20 @@ def dashboard():
     check_weekly_reset()
 
     budget = get_budget()
-    total_spent = get_total_spent()
+    total_spent = get_total_spent_this_week()
     remaining = get_remaining_budget()
     points_to_spend = get_points_to_spend_before_reset()
+    days_left = get_days_left_in_week()
+    average_points_per_day = get_average_points_per_day()
 
     return render_template(
         "dashboard.html",
         budget=budget,
         total_spent=total_spent,
         remaining=remaining,
-        points_to_spend=points_to_spend
+        points_to_spend=points_to_spend,
+        days_left=days_left,
+        average_points_per_day=average_points_per_day
     )
 
 @app.route("/test-reset")

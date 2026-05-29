@@ -48,10 +48,10 @@
   <div class="daily-card">
     <h3>Average Points Available Per Day</h3>
     <p class="daily-number">
-      {{ (remaining / 7) | round(2) if remaining is not none else 'N/A' }} points/day
+      {{ average_points_per_day if average_points_per_day is not none else 'N/A' }} points/day
     </p>
     <p class="muted">
-      Try to stay near this amount each day so your points last through the week.
+      Based on {{ days_left }} day{% if days_left != 1 %}s{% endif %} left before the Sunday reset.
     </p>
   </div>
 
