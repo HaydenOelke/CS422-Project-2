@@ -286,6 +286,7 @@ def force_weekly_reset():
     Forces the weekly reset immediately.
     Used only for testing.
     """
+    today = date.today()
     budget = get_budget_doc()
 
     if not budget:
@@ -303,7 +304,7 @@ def force_weekly_reset():
             "$set": {
                 "rollover_points": rollover_points,
                 "current_points": new_current_points,
-                "last_reset_date": date.today().isoformat(),
+                "last_reset_date": today.isoformat(),
                 "updated_at": datetime.utcnow()
             }
         }
@@ -315,15 +316,19 @@ def force_weekly_reset():
 def get_points_to_spend_before_reset():
     """
     Calculates how many points need to be spent before Sunday
-    so the user does not lose points above the rollover limit.
+    so the user does not lose points over the rollover limit.
     """
     budget = get_budget_doc()
 
     if not budget:
         return None
 
-    current_points = float(budget.get("current_points", 0))
-    return max(0, current_points - ROLLOVER_LIMIT)
+    weekly_points_left = float(budget.get("current_points", 0))
+    rollover_points_left = float(budget.get("rollover_points", 0))
+
+    total_points_that_could_rollover = weekly_points_left + rollover_points_left
+
+    return max(0, total_points_that_could_rollover - ROLLOVER_LIMIT)
 
 
 def get_remaining_budget():
