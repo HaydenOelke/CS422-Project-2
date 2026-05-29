@@ -14,18 +14,27 @@ purchases_col    = db["purchases"]
 
 def add_purchase(meal_name, dining_hall, point_value, meal_type="", purchase_date=None):
     """
-    Adds a purchased meal to the purchases collection.
-    This is used when a user clicks Purchase on the Browse Meals page.
+    Adds a purchased meal to the purchases collection only if enough points are available.
+    Weekly points are used first, then rollover points.
     """
     if purchase_date is None:
         purchase_date = date.today().isoformat()
+
+    point_value = float(point_value)
+
+    point_usage = subtract_points(point_value)
+
+    if point_usage is None:
+        return None
 
     purchase = {
         "meal_name": meal_name,
         "dining_hall": dining_hall,
         "meal_type": meal_type,
-        "point_value": float(point_value),
+        "point_value": point_value,
         "purchase_date": purchase_date,
+        "weekly_points_used": point_usage["weekly_used"],
+        "rollover_points_used": point_usage["rollover_used"],
         "created_at": datetime.utcnow()
     }
 
@@ -54,6 +63,24 @@ def get_total_spent():
     """
     purchases = get_all_purchases()
     return sum(purchase["point_value"] for purchase in purchases)
+
+def get_total_spent_this_week():
+    """
+    Returns the total number of points spent during the current week.
+    The week starts on Sunday, because meal points reset Sunday morning.
+    """
+    today = date.today()
+
+    # Python weekday: Monday = 0, Sunday = 6
+    # This calculates the most recent Sunday.
+    days_since_sunday = (today.weekday() + 1) % 7
+    sunday = today.fromordinal(today.toordinal() - days_since_sunday)
+
+    purchases = purchases_col.find({
+        "purchase_date": {"$gte": sunday.isoformat()}
+    })
+
+    return sum(float(purchase.get("point_value", 0)) for purchase in purchases)
 
 
 def get_purchase_by_id(purchase_id):
@@ -88,35 +115,227 @@ def add_purchase_again(purchase_id):
 
 def delete_purchase(purchase_id):
     """
-    Deletes a purchase from the purchases collection.
+    Deletes a purchase and restores the points that were used for it.
     """
-    return purchases_col.delete_one({"_id": ObjectId(purchase_id)})
+    purchase = get_purchase_by_id(purchase_id)
 
+    if not purchase:
+        return None
+
+    result = purchases_col.delete_one({"_id": ObjectId(purchase_id)})
+
+    if result.deleted_count == 1:
+        add_points(
+            weekly_points_used=purchase.get("weekly_points_used", purchase.get("point_value", 0)),
+            rollover_points_used=purchase.get("rollover_points_used", 0)
+        )
+
+    return result
 
 # ── Budget Management ─────────────────────────────
-def set_budget(amount):
+PLAN_OPTIONS = {
+    "Deluxe": 95,
+    "Standard": 80,
+    "Select": 65,
+    "Mini": 50,
+    "Carson-based": 5
+}
+
+ROLLOVER_LIMIT = 50
+
+
+def get_budget_doc():
     """
-    Sets or updates the meal points budget (global, single user).
+    Gets the global single-user budget document.
     """
+    return users_col.find_one({"_id": "budget"})
+
+
+def set_budget(plan_name, current_points=0, rollover_points=0):
+    """
+    Sets or updates the selected meal plan and current point balance.
+    """
+    plan_points = PLAN_OPTIONS.get(plan_name)
+
+    if plan_points is None:
+        raise ValueError("Invalid meal plan selected.")
+
     users_col.update_one(
         {"_id": "budget"},
-        {"$set": {"amount": float(amount)}},
+        {
+            "$set": {
+                "plan_name": plan_name,
+                "plan_points": float(plan_points),
+                "current_points": float(current_points),
+                "rollover_points": float(rollover_points),
+                "last_reset_date": None,
+                "updated_at": datetime.utcnow()
+            }
+        },
         upsert=True
     )
 
+
 def get_budget():
     """
-    Gets the current meal points budget (global, single user).
+    Gets the current budget document.
     """
-    doc = users_col.find_one({"_id": "budget"})
-    return doc["amount"] if doc and "amount" in doc else None
+    return get_budget_doc()
+
+
+def subtract_points(point_value):
+    """
+    Subtracts points from the weekly points first, then rollover points.
+    Returns a dictionary describing how many points were used from each bucket.
+    Returns None if there are not enough points.
+    """
+    point_value = float(point_value)
+    budget = get_budget_doc()
+
+    if not budget:
+        return None
+
+    current_points = float(budget.get("current_points", 0))
+    rollover_points = float(budget.get("rollover_points", 0))
+
+    total_available = current_points + rollover_points
+
+    if point_value > total_available:
+        return None
+
+    weekly_used = min(current_points, point_value)
+    rollover_used = point_value - weekly_used
+
+    new_current_points = current_points - weekly_used
+    new_rollover_points = rollover_points - rollover_used
+
+    users_col.update_one(
+        {"_id": "budget"},
+        {
+            "$set": {
+                "current_points": new_current_points,
+                "rollover_points": new_rollover_points,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+
+    return {
+        "weekly_used": weekly_used,
+        "rollover_used": rollover_used
+    }
+
+
+def add_points(weekly_points_used=0, rollover_points_used=0):
+    """
+    Adds points back to the same buckets they were originally spent from.
+    This is used when a purchase is deleted.
+    """
+    users_col.update_one(
+        {"_id": "budget"},
+        {
+            "$inc": {
+                "current_points": float(weekly_points_used),
+                "rollover_points": float(rollover_points_used)
+            },
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+
+
+def check_weekly_reset():
+    """
+    Checks whether today is Sunday and resets the weekly points if needed.
+    The reset only happens once per Sunday.
+    """
+    today = date.today()
+    budget = get_budget_doc()
+
+    if not budget:
+        return None
+
+    # Python weekday: Monday = 0, Sunday = 6
+    is_sunday = today.weekday() == 6
+    already_reset_today = budget.get("last_reset_date") == today.isoformat()
+
+    if not is_sunday or already_reset_today:
+        return budget
+
+    current_points = float(budget.get("current_points", 0))
+    plan_points = float(budget.get("plan_points", 0))
+
+    rollover_points = min(current_points, ROLLOVER_LIMIT)
+    new_current_points = plan_points + rollover_points
+
+    users_col.update_one(
+        {"_id": "budget"},
+        {
+            "$set": {
+                "rollover_points": rollover_points,
+                "current_points": new_current_points,
+                "last_reset_date": today.isoformat(),
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+
+    return get_budget_doc()
+
+def force_weekly_reset():
+    """
+    Forces the weekly reset immediately.
+    Used only for testing.
+    """
+    budget = get_budget_doc()
+
+    if not budget:
+        return None
+
+    current_points = float(budget.get("current_points", 0))
+    plan_points = float(budget.get("plan_points", 0))
+
+    rollover_points = min(current_points, ROLLOVER_LIMIT)
+    new_current_points = plan_points
+
+    users_col.update_one(
+        {"_id": "budget"},
+        {
+            "$set": {
+                "rollover_points": rollover_points,
+                "current_points": new_current_points,
+                "last_reset_date": date.today().isoformat(),
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+
+    return get_budget_doc()
+
+
+def get_points_to_spend_before_reset():
+    """
+    Calculates how many points need to be spent before Sunday
+    so the user does not lose points above the rollover limit.
+    """
+    budget = get_budget_doc()
+
+    if not budget:
+        return None
+
+    current_points = float(budget.get("current_points", 0))
+    return max(0, current_points - ROLLOVER_LIMIT)
+
 
 def get_remaining_budget():
     """
-    Returns the remaining budget (budget - total spent).
+    Returns the total points available, including weekly and rollover points.
     """
-    budget = get_budget()
-    spent = get_total_spent()
-    if budget is None:
+    budget = get_budget_doc()
+
+    if not budget:
         return None
-    return budget - spent
+
+    current_points = float(budget.get("current_points", 0))
+    rollover_points = float(budget.get("rollover_points", 0))
+
+    return current_points + rollover_points

@@ -1,57 +1,313 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
+
 {% block content %}
 <h1>Dashboard</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <div class="card">
-  <h2>Meal Points Budget</h2>
-  <form method="POST" action="/set-budget" style="margin-bottom:1.2rem;">
-    <label for="budget_amount">Select Meal Plan:</label>
-    <select name="budget_amount" id="budget_amount" required>
-      <option value="95" {% if budget == 95 %}selected{% endif %}>Deluxe: 95 points/week – For students who seldom skip a meal and occasionally treat a friend.</option>
-      <option value="80" {% if budget == 80 %}selected{% endif %}>Standard: 80 points/week – Most popular; enough for meals and snacks throughout the week.</option>
-      <option value="65" {% if budget == 65 %}selected{% endif %}>Select: 65 points/week – For students who might skip breakfast but not lunch or dinner.</option>
-      <option value="50" {% if budget == 50 %}selected{% endif %}>Mini: 50 points/week – For students who eat on the go and are often off campus on weekends.</option>
-      <option value="5" {% if budget == 5 %}selected{% endif %}>Carson-based: 5 points/week – Entry to Carson Dining any time, plus 5 points/week. Most economical for students.</option>
-    </select>
-    <button class="btn btn-primary" type="submit">Save Plan</button>
-  </form>
-  <div>
-    <p><strong>Current Plan Points/Week:</strong> {{ budget if budget is not none else 'Not set' }}</p>
-    <p><strong>Total Points Spent:</strong> {{ total_spent }}</p>
-    <p><strong>Remaining Points:</strong> {{ remaining if remaining is not none else 'N/A' }}</p>
+  <h2>Budget Overview</h2>
+
+  <div class="stats-grid">
+    <div class="stat-card main-stat">
+      <span class="stat-label">Current Points Remaining</span>
+      <span class="stat-value">
+        {{ remaining | round(2) if remaining is not none else 'N/A' }}
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Weekly Points Left</span>
+      <span class="stat-value">
+        {{ budget.current_points | round(2) if budget else 'N/A' }}
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Rollover Points Left</span>
+      <span class="stat-value">
+        {{ budget.rollover_points | round(2) if budget else 'N/A' }}
+      </span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-label">Points Spent This Week</span>
+      <span class="stat-value">
+        {{ total_spent | round(2) }}
+      </span>
+    </div>
   </div>
 
-  {% if budget is not none %}
-  <div class="card" style="background:#f8f9fa; margin-top:1.5rem;">
-    <h3>Average Points to Use Per Day</h3>
-    <p>
-      For a 7-day week: <strong>{{ (budget / 7) | round(0) }}</strong> points/day
+  <div class="daily-card">
+    <h3>Average Points Available Per Day</h3>
+    <p class="daily-number">
+      {{ (remaining / 7) | round(2) if remaining is not none else 'N/A' }} points/day
     </p>
-    <p style="font-size:.93em; color:#666;">Tip: Try to keep your daily spending near this amount to make your points last all week.</p>
+    <p class="muted">
+      Try to stay near this amount each day so your points last through the week.
+    </p>
   </div>
-  {% endif %}
+
+  <div class="warning-card">
+    <p>
+      <strong>Points to spend before Sunday to avoid losing rollover:</strong>
+      {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}
+    </p>
+
+    {% if budget and budget.last_reset_date %}
+      <p><strong>Last Weekly Reset:</strong> {{ budget.last_reset_date }}</p>
+    {% endif %}
+  </div>
 </div>
 
-<div class="card" style="padding:2rem;">
-    <h2>Tips & Tricks to Stay in Budget</h2>
-    <ul>
-      <li>Points renew every Sunday morning. Plan your week so you don't run out early or have too many left over.</li>
-      <li>Spend your points on any combination of items at any of the 14 dining venues (except Carson-based plan, which is dine-in only at Carson Dining).</li>
-      <li>Sample daily spending for 12 points: <br>
-        <div style="margin-left:1.5rem; color:#555; font-size:.95em;">
-          Breakfast at DUX Bistro—coffee and a bagel with cream cheese—2 points<br>
-          Lunch at Bullseye Taco—pollo asado burrito—4 points<br>
-          Dinner at Fresh! Marketcafé—shrimp scampi with a fountain drink—5 points<br>
-          Add a piece of fruit, milk, or cookies—1 point
-        </div>
-      </li>
-      <li>Choose a plan that fits your eating habits. Deluxe (95), Standard (80), Select (65), and Mini (50) all include $50 Duck Bucks per term. Or Carson-based plan: 
-        Entry to Carson Dining any time, plus 5 points/week and $50 Duck Bucks/term. Most economical for frequent Carson diners.</li>
-      <li>Some dining halls may have limited hours during holidays. <a href="https://housing.uoregon.edu/breaks" target="_blank">See Holidays and Breaks info</a>.</li>
-      <br>
-      <li><strong>Rollover:</strong> Up to 50 unused points roll over each week, but reset at the start of a new term. Rollover points can only be used after using your weekly allotment.</li>
-    </ul>
-    <br>
-    <p>In case you have questions about your point balance, check it on <a href="https://housing.uoregon.edu/myhousing" target="_blank">My Housing</a> or at any dining venue.</p>
-  </div>
+<div class="card settings-card">
+  <h2>Update Budget Settings</h2>
+
+  <form method="POST" action="/set-budget" style="display:grid;gap:.8rem;">
+    <div>
+      <label for="plan_name">Select Meal Plan:</label>
+      <select name="plan_name" id="plan_name" required>
+        <option value="Deluxe" {% if budget and budget.plan_name == "Deluxe" %}selected{% endif %}>
+          Deluxe: 95 points/week
+        </option>
+        <option value="Standard" {% if budget and budget.plan_name == "Standard" %}selected{% endif %}>
+          Standard: 80 points/week
+        </option>
+        <option value="Select" {% if budget and budget.plan_name == "Select" %}selected{% endif %}>
+          Select: 65 points/week
+        </option>
+        <option value="Mini" {% if budget and budget.plan_name == "Mini" %}selected{% endif %}>
+          Mini: 50 points/week
+        </option>
+        <option value="Carson-based" {% if budget and budget.plan_name == "Carson-based" %}selected{% endif %}>
+          Carson-based: 5 points/week
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label for="current_points">Current Weekly Points:</label>
+      <input
+        type="number"
+        name="current_points"
+        id="current_points"
+        step="0.01"
+        min="0"
+        value="{{ budget.current_points if budget else '' }}"
+        required>
+    </div>
+
+    <div>
+      <label for="rollover_points">Current Rollover Points:</label>
+      <input
+        type="number"
+        name="rollover_points"
+        id="rollover_points"
+        step="0.01"
+        min="0"
+        value="{{ budget.rollover_points if budget else 0 }}">
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save Budget</button>
+  </form>
+</div>
+
+<div class="card tips-card">
+  <h2>Tips & Tricks to Stay in Budget</h2>
+
+  <ul>
+    <li>Points renew every Sunday morning. Plan your week so you do not run out early or have too many left over.</li>
+
+    <li>
+      Spend your points on any combination of items at any of the 14 dining venues.
+      The Carson-based plan is dine-in only at Carson Dining.
+    </li>
+
+    <li>
+      Sample daily spending for 12 points:
+      <div class="sample-spending">
+        Breakfast at DUX Bistro — coffee and a bagel with cream cheese — 2 points<br>
+        Lunch at Bullseye Taco — pollo asado burrito — 4 points<br>
+        Dinner at Fresh! Marketcafé — shrimp scampi with a fountain drink — 5 points<br>
+        Add a piece of fruit, milk, or cookies — 1 point
+      </div>
+    </li>
+
+    <li>
+      Choose a plan that fits your eating habits. Deluxe, Standard, Select, and Mini all include $50 Duck Bucks per term.
+      The Carson-based plan includes entry to Carson Dining, 5 points per week, and $50 Duck Bucks per term.
+    </li>
+
+    <li>
+      Some dining halls may have limited hours during holidays.
+      <a href="https://housing.uoregon.edu/breaks" target="_blank">See Holidays and Breaks info.</a>
+    </li>
+
+    <li>
+      <strong>Rollover:</strong> Up to 50 unused points roll over each week, but reset at the start of a new term.
+      Rollover points can only be used after using your weekly allotment.
+    </li>
+  </ul>
+
+  <p class="muted">
+    In case you have questions about your point balance, check it on
+    <a href="https://housing.uoregon.edu/myhousing" target="_blank">My Housing</a>
+    or at any dining venue.
+  </p>
+</div>
+
+<style>
+  h2 {
+    color: #1a3a2a;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: #1a3a2a;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .stat-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    border-left: 5px solid #1a3a2a;
+  }
+
+  .main-stat {
+    grid-column: 1 / -1;
+    background: #eef5f0;
+  }
+
+  .stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a3a2a;
+  }
+
+  .main-stat .stat-value {
+    font-size: 2.6rem;
+  }
+
+  .daily-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .daily-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a3a2a;
+    margin-top: 0.35rem;
+  }
+
+  .warning-card {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fffbea;
+    border-radius: 10px;
+    border-left: 5px solid #d6a600;
+  }
+
+  .warning-card p {
+    margin-bottom: 0.4rem;
+  }
+
+  .warning-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .settings-card {
+    margin-top: 1.25rem;
+  }
+
+  .settings-card h2 {
+    font-size: 1.15rem;
+  }
+
+  .tips-card {
+    margin-top: 1.25rem;
+  }
+
+  .tips-card ul {
+    margin-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .tips-card li {
+    margin-bottom: 0.65rem;
+  }
+
+  .sample-spending {
+    margin-left: 1.5rem;
+    margin-top: 0.4rem;
+    color: #555;
+    font-size: 0.95rem;
+  }
+
+  .muted {
+    color: #666;
+    font-size: 0.93rem;
+  }
+
+  label {
+    font-weight: 600;
+    color: #222;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.55rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+  }
+
+  button {
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 700px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .main-stat {
+      grid-column: auto;
+    }
+
+    .main-stat .stat-value {
+      font-size: 2rem;
+    }
+  }
+</style>
+
 {% endblock %}
