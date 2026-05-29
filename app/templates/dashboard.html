@@ -1,9 +1,19 @@
+<!-- 
+  Dashboard Template
+  Purpose: Displays the user's current budget overview, including weekly points, rollover points, and points spent.
+  Authors: Rayna Fisher, Caeleb Renner
+  Date Created: 5/21/2026
+-->
+
+<!-- Extend the base template -->
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 
+<!-- Begin the body content -->
 {% block content %}
 <h1>Dashboard</h1>
 
+<!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
@@ -12,39 +22,55 @@
   {% endif %}
 {% endwith %}
 
-<div class="card">
-  <h2>Budget Overview</h2>
+<!-- If there is a budget available -->
+{% if budget %}
 
-  <div class="stats-grid">
-    <div class="stat-card main-stat">
-      <span class="stat-label">Current Points Remaining</span>
+<!-- Warn User About Rollover Points -->
+<div class="card warning-card">
+  <p><strong>Points to spend before Sunday to avoid losing rollover:</strong> {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}</p>
+  {% if budget and budget.last_reset_date %}
+    <p><strong>Last Weekly Reset:</strong> {{ budget.last_reset_date }}</p>
+  {% endif %}
+</div>
+
+<!-- Budget Overview Card -->
+<div class="card">
+  <h2>Current Budget Overview</h2>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;">
+    <!-- Weekly Points to Spend -->
+    <div class="stat-card">
+      <span class="stat-label">Weekly Points</span>
+      <span class="stat-value">
+        {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}
+      </span>
+    </div>
+
+    <!-- Weekly Points Left -->
+    <div class="stat-card">
+      <span class="stat-label">Weekly Points Left</span>
       <span class="stat-value">
         {{ remaining | round(2) if remaining is not none else 'N/A' }}
       </span>
     </div>
 
-    <div class="stat-card">
-      <span class="stat-label">Weekly Points Left</span>
-      <span class="stat-value">
-        {{ budget.current_points | round(2) if budget else 'N/A' }}
-      </span>
-    </div>
-
+    <!-- Rollover Points Left -->
     <div class="stat-card">
       <span class="stat-label">Rollover Points Left</span>
       <span class="stat-value">
-        {{ budget.rollover_points | round(2) if budget else 'N/A' }}
+        {{ budget.rollover_points | round(2) if budget.rollover_points is not none else 'N/A' }}
       </span>
     </div>
 
+    <!-- Points Spent This Week -->
     <div class="stat-card">
       <span class="stat-label">Points Spent This Week</span>
       <span class="stat-value">
-        {{ total_spent | round(2) }}
+        {{ total_spent | round(2) if total_spent is not none else 'N/A' }}
       </span>
     </div>
   </div>
 
+  <!-- Average Points Per Day to Spend -->
   <div class="daily-card">
     <h3>Average Points Available Per Day</h3>
     <p class="daily-number">
@@ -54,22 +80,15 @@
       Based on {{ days_left }} day{% if days_left != 1 %}s{% endif %} left before the Sunday reset.
     </p>
   </div>
-
-  <div class="warning-card">
-    <p>
-      <strong>Points to spend before Sunday to avoid losing rollover:</strong>
-      {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}
-    </p>
-
-    {% if budget and budget.last_reset_date %}
-      <p><strong>Last Weekly Reset:</strong> {{ budget.last_reset_date }}</p>
-    {% endif %}
-  </div>
 </div>
 
-<div class="card settings-card">
-  <h2>Update Budget Settings</h2>
+{% endif %}
 
+<!-- Update Budget Card -->
+<div class="card">
+  <h1>Update Budget</h1>
+
+  <!-- Form for updating the budget includes each budget and amount -->
   <form method="POST" action="/set-budget" style="display:grid;gap:.8rem;">
     <div>
       <label for="plan_name">Select Meal Plan:</label>
@@ -92,6 +111,7 @@
       </select>
     </div>
 
+    <!-- Input fields for current points and rollover points -->
     <div>
       <label for="current_points">Current Weekly Points:</label>
       <input
@@ -119,7 +139,8 @@
   </form>
 </div>
 
-<div class="card tips-card">
+<!-- Tips & Tricks Card -->
+<div class="card">
   <h2>Tips & Tricks to Stay in Budget</h2>
 
   <ul>
@@ -163,6 +184,7 @@
   </p>
 </div>
 
+<!-- Styles for the dashboard -->
 <style>
   h2 {
     color: #1a3a2a;
