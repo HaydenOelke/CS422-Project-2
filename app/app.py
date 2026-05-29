@@ -120,7 +120,7 @@ def meal_add():
         }},
         upsert=True
     )
-    flash(f"{meal_name} added successfully.", "success")
+    flash(f"'{meal_name}' added successfully.", "success")
     return redirect(url_for("meals"))
 
 @app.route("/meals/log", methods=["POST"])
@@ -139,10 +139,10 @@ def meal_log():
     purchase_id = add_purchase(item_name, location, point_cost, meal_type)
 
     if purchase_id is None:
-        flash("You do not have enough weekly or rollover points to add this meal.", "error")
+        flash("An Error occured: Please make sure you have saved a budget in the Dashboard and have enough weekly or rollover points to add this meal.", "error")
         return redirect(url_for("meals"))
 
-    flash(f"{item_name} logged to purchase history.", "success")
+    flash(f"'{item_name}' logged to purchase history.", "success")
     return redirect(url_for("meals"))
 
 # ── CSV Upload (for teammate to hook into settings) ───────────────────────────

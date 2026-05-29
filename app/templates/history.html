@@ -1,18 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Purchase History{% endblock %}
-
 {% block content %}
-<h1>Purchase History</h1>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <div class="card">
-      {% for message in messages %}
-        <p>{{ message }}</p>
-      {% endfor %}
-    </div>
-  {% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
 {% endwith %}
+
+<h1>Purchase History</h1>
 
 <div class="card">
   <h2>Spending Summary</h2>
@@ -23,39 +19,40 @@
   <h2>Past Purchases</h2>
 
   {% if purchases %}
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Item</th>
-          <th>Location</th>
-          <th>Cost</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Item</th>
+        <th>Location</th>
+        <th>Cost</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-      <tbody>
-        {% for purchase in purchases %}
-          <tr>
-            <td>{{ purchase.purchase_date }}</td>
-            <td>{{ purchase.meal_name }}</td>
-            <td>{{ purchase.dining_hall }}</td>
-            <td>{{ "%.2f"|format(purchase.point_value) }}</td>
-            <td class="actions">
-              <form method="POST" action="/history/add-again/{{ purchase._id }}">
-                <button type="submit">Add Again</button>
-              </form>
+    <tbody>
+      {% for purchase in purchases %}
+      <tr>
+        <td>{{ purchase.purchase_date }}</td>
+        <td>{{ purchase.meal_name }}</td>
+        <td>{{ purchase.dining_hall }}</td>
+        <td>{{ "%.2f"|format(purchase.point_value) }}</td>
+        <td class="actions">
+          <form method="POST" action="/history/add-again/{{ purchase._id }}">
+            <button type="submit">Add Again</button>
+          </form>
 
-              <form method="POST" action="/history/delete/{{ purchase._id }}">
-                <button type="submit" class="delete-button">Delete</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          <form method="POST" action="/history/delete/{{ purchase._id }}">
+            <button type="submit" class="delete-button">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   {% else %}
-    <p>No purchases have been added yet. Purchases will appear here after meals are purchased from the Browse Meals page.</p>
+  <p>No purchases have been added yet. Purchases will appear here after meals are purchased from the Browse Meals page.
+  </p>
   {% endif %}
 </div>
 
@@ -94,7 +91,8 @@
     margin-top: 1rem;
   }
 
-  th, td {
+  th,
+  td {
     text-align: left;
     padding: 0.75rem;
     border-bottom: 1px solid #ddd;

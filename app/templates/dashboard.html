@@ -15,11 +15,11 @@
 
 <!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="flash {{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
 
 <!-- If there is a budget available -->
@@ -27,9 +27,10 @@
 
 <!-- Warn User About Rollover Points -->
 <div class="card warning-card">
-  <p><strong>Points to spend before Sunday to avoid losing rollover:</strong> {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}</p>
+  <p><strong>Points to spend before Sunday to avoid losing rollover:</strong> {{ points_to_spend | round(2) if
+    points_to_spend is not none else 'N/A' }}</p>
   {% if budget and budget.last_reset_date %}
-    <p><strong>Last Weekly Reset:</strong> {{ budget.last_reset_date }}</p>
+  <p><strong>Last Weekly Reset:</strong> {{ budget.last_reset_date }}</p>
   {% endif %}
 </div>
 
@@ -37,19 +38,20 @@
 <div class="card">
   <h2>Current Budget Overview</h2>
   <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;">
-    <!-- Weekly Points to Spend -->
-    <div class="stat-card">
-      <span class="stat-label">Weekly Points</span>
-      <span class="stat-value">
-        {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}
-      </span>
-    </div>
 
     <!-- Weekly Points Left -->
     <div class="stat-card">
       <span class="stat-label">Weekly Points Left</span>
       <span class="stat-value">
         {{ remaining | round(2) if remaining is not none else 'N/A' }}
+      </span>
+    </div>
+
+    <!-- Points Spent This Week -->
+    <div class="stat-card">
+      <span class="stat-label">Points Spent This Week</span>
+      <span class="stat-value">
+        {{ total_spent | round(2) if total_spent is not none else 'N/A' }}
       </span>
     </div>
 
@@ -61,11 +63,11 @@
       </span>
     </div>
 
-    <!-- Points Spent This Week -->
+    <!-- Weekly Points to Spend -->
     <div class="stat-card">
-      <span class="stat-label">Points Spent This Week</span>
+      <span class="stat-label">Points to Spend Before Sunday to Avoid Losing Rollover</span>
       <span class="stat-value">
-        {{ total_spent | round(2) if total_spent is not none else 'N/A' }}
+        {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}
       </span>
     </div>
   </div>
@@ -77,7 +79,7 @@
       {{ average_points_per_day if average_points_per_day is not none else 'N/A' }} points/day
     </p>
     <p class="muted">
-      Based on {{ days_left }} day{% if days_left != 1 %}s{% endif %} left before the Sunday reset.
+      Based on {{ days_left }} day{% if days_left != 1 %}s{% endif %} left before the Sunday Meal Points reset.
     </p>
   </div>
 </div>
@@ -93,19 +95,19 @@
     <div>
       <label for="plan_name">Select Meal Plan:</label>
       <select name="plan_name" id="plan_name" required>
-        <option value="Deluxe" {% if budget and budget.plan_name == "Deluxe" %}selected{% endif %}>
+        <option value="Deluxe" {% if budget and budget.plan_name=="Deluxe" %}selected{% endif %}>
           Deluxe: 95 points/week
         </option>
-        <option value="Standard" {% if budget and budget.plan_name == "Standard" %}selected{% endif %}>
+        <option value="Standard" {% if budget and budget.plan_name=="Standard" %}selected{% endif %}>
           Standard: 80 points/week
         </option>
-        <option value="Select" {% if budget and budget.plan_name == "Select" %}selected{% endif %}>
+        <option value="Select" {% if budget and budget.plan_name=="Select" %}selected{% endif %}>
           Select: 65 points/week
         </option>
-        <option value="Mini" {% if budget and budget.plan_name == "Mini" %}selected{% endif %}>
+        <option value="Mini" {% if budget and budget.plan_name=="Mini" %}selected{% endif %}>
           Mini: 50 points/week
         </option>
-        <option value="Carson-based" {% if budget and budget.plan_name == "Carson-based" %}selected{% endif %}>
+        <option value="Carson-based" {% if budget and budget.plan_name=="Carson-based" %}selected{% endif %}>
           Carson-based: 5 points/week
         </option>
       </select>
@@ -114,24 +116,13 @@
     <!-- Input fields for current points and rollover points -->
     <div>
       <label for="current_points">Current Weekly Points:</label>
-      <input
-        type="number"
-        name="current_points"
-        id="current_points"
-        step="0.01"
-        min="0"
-        value="{{ budget.current_points if budget else '' }}"
-        required>
+      <input type="number" name="current_points" id="current_points" step="0.01" min="0"
+        value="{{ budget.current_points if budget else '' }}" required>
     </div>
 
     <div>
       <label for="rollover_points">Current Rollover Points:</label>
-      <input
-        type="number"
-        name="rollover_points"
-        id="rollover_points"
-        step="0.01"
-        min="0"
+      <input type="number" name="rollover_points" id="rollover_points" step="0.01" min="0"
         value="{{ budget.rollover_points if budget else 0 }}">
     </div>
 
@@ -162,7 +153,8 @@
     </li>
 
     <li>
-      Choose a plan that fits your eating habits. Deluxe, Standard, Select, and Mini all include $50 Duck Bucks per term.
+      Choose a plan that fits your eating habits. Deluxe, Standard, Select, and Mini all include $50 Duck Bucks per
+      term.
       The Carson-based plan includes entry to Carson Dining, 5 points per week, and $50 Duck Bucks per term.
     </li>
 
