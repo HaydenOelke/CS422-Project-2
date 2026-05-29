@@ -120,7 +120,7 @@ def meal_add():
         }},
         upsert=True
     )
-    flash(f"'{meal_name}' added successfully.", "success")
+    flash(f"'{meal_name}' added to meal options successfully.", "success")
     return redirect(url_for("meals"))
 
 @app.route("/meals/log", methods=["POST"])
@@ -129,6 +129,7 @@ def meal_log():
     point_cost  = request.form.get("point_cost", "").strip()
     location    = request.form.get("location", "").strip()
     meal_type   = request.form.get("meal_type", "").strip()
+    purchase_date = request.form.get("purchase_date", "").strip() or None
 
     try:
         point_cost = float(point_cost)
@@ -136,7 +137,7 @@ def meal_log():
         flash("Point cost must be a number.", "error")
         return redirect(url_for("meals"))
 
-    purchase_id = add_purchase(item_name, location, point_cost, meal_type)
+    purchase_id = add_purchase(item_name, location, point_cost, meal_type, purchase_date)
 
     if purchase_id is None:
         flash("An Error occured: Please make sure you have saved a budget in the Dashboard and have enough weekly or rollover points to add this meal.", "error")
