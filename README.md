@@ -22,25 +22,46 @@ The backend is built with Flask and MongoDB, and the frontend uses Jinja2 templa
 - [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/) installed
 - (Optional for local run) Python 3.11 and pip
 
-### Running with Docker
-1. Open a terminal in the project directory.
-2. Build and start the containers:
+### Running with Docker (Recommended)
+1. Ensure the Docker daemon or Docker Desktop is running
+2. Open a terminal in the project root ('CS422-Project-2') directory.
+3. Build and start the containers:
+Execute the 'run.sh' script. For example:
+	```sh
+	bash run.sh
+	```
+
+Or manually:
 	```sh
 	docker-compose up --build
 	```
-3. Visit [http://localhost:8080](http://localhost:8080) in your browser.
+
+3. Open a web browser application and enter the following url:
+
+[http://127.0.0.1:8080/](http://127.0.0.1:8080/)
+
+or alternatively:
+
+[http://localhost:8080](http://localhost:8080)
 
 ### Running Locally (Without Docker)
-1. Install Python dependencies:
+1. Open a terminal in the project root ('CS422-Project-2') directory.
+2. Install Python dependencies:
 	```sh
 	pip install -r app/requirements.txt
 	```
-2. Make sure MongoDB is running locally (default: `mongodb://localhost:27017/mealtrack`).
-3. Start the Flask app:
+3. Make sure MongoDB is running locally (default: `mongodb://localhost:27017/mealtrack`).
+4. Start the Flask app:
 	```sh
 	python app/app.py
 	```
-4. Visit [http://localhost:5000](http://localhost:5000) in your browser.
+5. Open a web browser application and enter the following url:
+
+[http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+
+or alternatively:
+
+[http://localhost:5000](http://localhost:5000)
 
 ---
 For any issues, check your Python, Docker, and MongoDB installations.
