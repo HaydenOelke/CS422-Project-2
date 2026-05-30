@@ -1,3 +1,16 @@
+"""
+This is the database operations file for the MealTrack application. It defines the database operations
+for the application, such as adding a purchase, getting all purchases, adding a purchase again,
+deleting a purchase, setting the budget, getting the budget, getting the total spent, getting the total
+spent this week, getting the remaining budget, checking the weekly reset, getting the points to spend
+before the reset, forcing the weekly reset, getting the days left in the week, and getting the average
+points per day.
+
+Authors: Rayna Fisher, Hayden Oelke, Kobe Pane, Caeleb Renner
+
+Date Created: 5/21/2026
+"""
+
 import os
 from pymongo import MongoClient
 from datetime import datetime, date

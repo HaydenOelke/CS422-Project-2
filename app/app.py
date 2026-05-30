@@ -1,3 +1,13 @@
+"""
+This is the flask backend file for the MealTrack application. It handles the routing of the application,
+and utilizes database operations defined in the db.py file. It also includes logic for the application,
+such as budget calculations, purchase history, and meal options.
+
+Authors: Rayna Fisher, Hayden Oelke, Kobe Pane, Caeleb Renner
+
+Date Created: 5/21/2026
+"""
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from db import (
     meal_options_col,
