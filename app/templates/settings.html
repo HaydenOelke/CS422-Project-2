@@ -1,11 +1,22 @@
+<!-- 
+  Admin Settings Template - settings.html
+
+  Purpose: This HTML file displays the admin settings for the application, including the ability to
+  upload a meal catalog CSV to update the default meal options across all dining halls.
+
+  Authors: Kobe Pane
+  
+  Date Created: 5/21/2026
+-->
+
 {% extends "base.html" %}
 {% block title %}Settings{% endblock %}
 {% block content %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <div class="flash {{ category }}">{{ message }}</div>
-  {% endfor %}
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
 {% endwith %}
 
 <h1>Settings</h1>
@@ -15,7 +26,8 @@
   <p>Upload a meal catalog CSV to update the default meal options across all dining halls.</p>
   <p>Required headers (exact order): <code>meal_name,point_value,meal_type,dining_hall</code></p>
 
-  <form class="upload-form" method="POST" action="{{ url_for('meal_upload') }}" enctype="multipart/form-data" style="display:grid;gap:.75rem;">
+  <form class="upload-form" method="POST" action="{{ url_for('meal_upload') }}" enctype="multipart/form-data"
+    style="display:grid;gap:.75rem;">
     <div>
       <label for="csv_file">Meal Catalog CSV</label>
       <input id="csv_file" name="csv_file" type="file" accept=".csv,text/csv" required>
