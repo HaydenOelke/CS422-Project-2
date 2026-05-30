@@ -29,11 +29,11 @@ The backend is built with Flask and MongoDB, and the frontend uses Jinja2 templa
 	```sh
 	bash run.sh
 	```
-Or manually:
+4. Or manually:
 	```sh
 	docker-compose up --build
 	```
-3. Open a web browser application and enter the following url:
+5. Open a web browser application and enter the following url:
 
 [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
 
