@@ -25,17 +25,14 @@ The backend is built with Flask and MongoDB, and the frontend uses Jinja2 templa
 ### Running with Docker (Recommended)
 1. Ensure the Docker daemon or Docker Desktop is running
 2. Open a terminal in the project root ('CS422-Project-2') directory.
-3. Build and start the containers:
-Execute the 'run.sh' script. For example:
+3. To build and start the containers, execute the 'run.sh' script. For example:
 	```sh
 	bash run.sh
 	```
-
 Or manually:
 	```sh
 	docker-compose up --build
 	```
-
 3. Open a web browser application and enter the following url:
 
 [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
