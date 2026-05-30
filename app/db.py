@@ -289,10 +289,14 @@ def check_weekly_reset():
         return budget
 
     current_points = float(budget.get("current_points", 0))
+    existing_rollover_points = float(budget.get("rollover_points", 0))
     plan_points = float(budget.get("plan_points", 0))
 
-    rollover_points = min(current_points, ROLLOVER_LIMIT)
-    new_current_points = plan_points + rollover_points
+    # Keep up to 50 total unused points from both weekly and rollover buckets.
+    rollover_points = min(current_points + existing_rollover_points, ROLLOVER_LIMIT)
+
+    # Weekly points reset to the selected plan amount.
+    new_current_points = plan_points
 
     users_col.update_one(
         {"_id": "budget"},
@@ -320,9 +324,10 @@ def force_weekly_reset():
         return None
 
     current_points = float(budget.get("current_points", 0))
+    existing_rollover_points = float(budget.get("rollover_points", 0))
     plan_points = float(budget.get("plan_points", 0))
 
-    rollover_points = min(current_points, ROLLOVER_LIMIT)
+    rollover_points = min(current_points + existing_rollover_points, ROLLOVER_LIMIT)
     new_current_points = plan_points
 
     users_col.update_one(
