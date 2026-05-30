@@ -37,21 +37,22 @@
 <!-- Budget Overview Card -->
 <div class="card">
   <h2>Current Budget Overview</h2>
-  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;">
 
-    <!-- Weekly Points Left -->
-    <div class="stat-card">
-      <span class="stat-label">Weekly Points Left</span>
+  <div class="stats-grid">
+
+    <!-- Total Points Available -->
+    <div class="stat-card main-stat">
+      <span class="stat-label">Total Points Available</span>
       <span class="stat-value">
         {{ remaining | round(2) if remaining is not none else 'N/A' }}
       </span>
     </div>
 
-    <!-- Points Spent This Week -->
+    <!-- Weekly Points Left -->
     <div class="stat-card">
-      <span class="stat-label">Points Spent This Week</span>
+      <span class="stat-label">Weekly Points Left</span>
       <span class="stat-value">
-        {{ total_spent | round(2) if total_spent is not none else 'N/A' }}
+        {{ budget.current_points | round(2) if budget.current_points is not none else 'N/A' }}
       </span>
     </div>
 
@@ -63,16 +64,25 @@
       </span>
     </div>
 
-    <!-- Weekly Points to Spend -->
+    <!-- Points Spent This Week -->
+    <div class="stat-card">
+      <span class="stat-label">Points Spent This Week</span>
+      <span class="stat-value">
+        {{ total_spent | round(2) if total_spent is not none else 'N/A' }}
+      </span>
+    </div>
+
+    <!-- Points to Spend Before Sunday -->
     <div class="stat-card">
       <span class="stat-label">Points to Spend Before Sunday to Avoid Losing Rollover</span>
       <span class="stat-value">
         {{ points_to_spend | round(2) if points_to_spend is not none else 'N/A' }}
       </span>
     </div>
+
   </div>
 
-  <!-- Average Points Per Day to Spend -->
+  <!-- Average Points Per Day -->
   <div class="daily-card">
     <h3>Average Points Available Per Day</h3>
     <p class="daily-number">
