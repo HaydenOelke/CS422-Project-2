@@ -1,0 +1,126 @@
+meal_name,point_value,meal_type,dining_hall
+Duck 'n' Out Burger,4,Meal,Ducks's House
+BBQ Burger,4,Meal,Ducks's House
+Salmon Sandwich,4,Meal,Ducks's House
+Beyond® Burger,4,Meal,Ducks's House
+Chicken Club Sandwich,4,Meal,Ducks's House
+Caesar Salad,4,Salads,Ducks's House
+Skillet Potatoes and Eggs,4,Meal,Ducks's House
+Eggs Your Way,4,Meal,Ducks's House
+Breakfast Sandwich,4,Meal,Ducks's House
+Oregon Waffle,4,Meal,Ducks's House
+Brioche Breakfast Sandwic,4,Meal,Ducks's House
+Scrambled Egg Breakfast Burrito,4,Entrées,Bullseye Taco
+Pepper Bacon Breakfast Burrito,4,Entrées,Bullseye Taco
+Vegan Chorizo Breakfast Burrito,4,Entrées,Bullseye Taco
+Carnitas Tacos/Burrito,4,Entrées,Bullseye Taco
+Chorizo con Papas Tacos/Burrito,4,Entrées,Bullseye Taco
+Pollo Asado Tacos/Burrito,4,Entrées,Bullseye Taco
+Guacamole Tacos/Burrito,4,Entrées,Bullseye Taco
+Pinto beans (vegan),2,Sides,Bullseye Taco
+Black beans (vegan),2,Sides,Bullseye Taco
+Queso dip with tortilla chips,4,Sides,Bullseye Taco
+Guacamole,2,Sides,Bullseye Taco
+Spanish rice,2,Sides,Bullseye Taco
+Fresh guacamole with chips,4,Sides,Bullseye Taco
+Chips and salsa,2,Sides,Bullseye Taco
+Lasagna Bolognese,4,Entrées,Drake's Deli
+Rotisserie chicken,4,Entrées,Drake's Deli
+Lemon-dill steelhead,4,Entrées,Drake's Deli
+Fried chicken,4,Entrées,Drake's Deli
+Pot pie,4,Entrées,Drake's Deli
+Smoked turkey,4,Entrées,Drake's Deli
+Fruit salad,2,Sides,Drake's Deli
+Waffle fries,2,Sides,Drake's Deli
+Chocolate chip cookie,2,Sides,Drake's Deli
+Salad of the day,2,Sides,Drake's Deli
+Kettle chips,2,Sides,Drake's Deli
+Herb roasted potatoes,2,Sides,Drake's Deli
+JoJo’s,2,Sides,Drake's Deli
+Mac and cheese,2,Sides,Drake's Deli
+Seasonal veggies,2,Sides,Drake's Deli
+Chicken and biscuit,4,Entrées,Drake's Deli
+Deli breakfast sandwich,4,Entrées,Drake's Deli
+Biscuits and gravy,4,Entrées,Drake's Deli
+Hash browns and fried chicken with sausage gravy,4,Entrées,Drake's Deli
+Roman-Style Pizza,4,Pizza,Hearth & Soul
+Roman Salad,3,Salads,Hearth & Soul
+Caesar,3,Salads,Hearth & Soul
+Tomato Bisque,3,Soup,Hearth & Soul
+Seasonal soup of the day,3,Soup,Hearth & Soul
+Caffè Latte,3,Coffee and Tea,PNW Café
+Caffè Mocha,3,Coffee and Tea,PNW Café
+White Chocolate Mocha,3,Coffee and Tea,PNW Café
+Freshly Brewed Coffee,3,Coffee and Tea,PNW Café
+Shaken Espresso,3,Coffee and Tea,PNW Café
+Cappuccino,3,Coffee and Tea,PNW Café
+Caramel Macchiato,3,Coffee and Tea,PNW Café
+Cold Brew Coffee,3,Coffee and Tea,PNW Café
+Hot Chocolate,3,Coffee and Tea,PNW Café
+Shaken Iced Tea (black or green tea),3,Teavana® Handcrafted Tea,PNW Café
+Hot Tea,3,Teavana® Handcrafted Tea,PNW Café
+Chai Latte,3,Teavana® Handcrafted Tea,PNW Café
+Iced Beverages (contain caffeine),3,Starbucks Refreshers®,PNW Café
+Mango Dragonfruit,3,Starbucks Refreshers®,PNW Café
+Strawberry Açaí,3,Starbucks Refreshers®,PNW Café
+Bacon Breakfast Sandwich,4,Sandwiches,Puddles Café
+Breakfast Turkey Sausage Croissant,4,Sandwiches,Puddles Café
+Caprese Sandwich,4,Sandwiches,Puddles Café
+Vegan Breakfast Sandwich,4,Sandwiches,Puddles Café
+Bacon Ranch Breakfast Burrito,4,Sandwiches,Puddles Café
+Caprese Sandwich,4,Sandwiches,Puddles Café
+Turkey Chipotle Sandwich,4,Sandwiches,Puddles Café
+Roast Beef and Arugula Cashew Pesto Sandwich,4,Sandwiches,Puddles Café
+Memphis Slider,4,Sandwiches,Puddles Café
+Caffè Latte,3,Coffee and Tea,Puddles Café
+Caffè Mocha,3,Coffee and Tea,Puddles Café
+White Chocolate Mocha,3,Coffee and Tea,Puddles Café
+Freshly Brewed Coffee,3,Coffee and Tea,Puddles Café
+Teavana® Handcrafted Tea Iced Beverages,3,Coffee and Tea,Puddles Café
+Cappuccino,3,Coffee and Tea,Puddles Café
+Caramel Macchiato,3,Coffee and Tea,Puddles Café
+Cold Brew Coffee,3,Coffee and Tea,Puddles Café
+Hot Chocolate,3,Coffee and Tea,Puddles Café
+Strawberry Fields,3,Smoothies,Puddles Café
+Orange Creamcicle,3,Smoothies,Puddles Café
+Peaches and Green,3,Smoothies,Puddles Café
+Coconut Mango Blast,3,Smoothies,Puddles Café
+Strawberry Açaí,3,Starbucks Refreshers®,Puddles Café
+Mango Dragonfruit,3,Starbucks Refreshers®,Puddles Café
+Yakisoba and Macaroni salad with Teriyaki chicken,4,Meal,Steam
+Yakisoba and Macaroni salad with Kalua pork,4,Meal,Steam
+Yakisoba and Macaroni salad with Sesame tofu,4,Meal,Steam
+Yakisoba and Steamed rice with Teriyaki chicken,4,Meal,Steam
+Yakisoba and Steamed rice with Kalua pork,4,Meal,Steam
+Yakisoba and Steamed rice with Sesame tofu,4,Meal,Steam
+Macaroni salad and Steamed rice with Teriyaki chicken,4,Meal,Steam
+Macaroni salad and Steamed rice with Kalua pork,4,Meal,Steam
+Macaroni salad and Steamed rice with Sesame tofu,4,Meal,Steam
+Butter Chicken,4,Entrées,Tamarind
+Dal Bat Samosa,4,Entrées,Tamarind
+Yellow dal,2,Sides,Tamarind
+Palak paneer,2,Sides,Tamarind
+Goda masala cauliflower,2,Sides,Tamarind
+Jerra rice,2,Sides,Tamarind
+Coconut chana masala,2,Sides,Tamarind
+Oven-baked naan brushed with spiced ghee,2,Sides,Tamarind
+Sunshine,3,Juices,Watershed
+Pink Lemonade,3,Juices,Watershed
+Cure All,3,Juices,Watershed
+Blue Butterfly,3,Juices,Watershed
+Vitality,3,Smoothies,Watershed
+Island Rain,3,Smoothies,Watershed
+Health Nut,3,Smoothies,Watershed
+Chia Pet,3,Smoothies,Watershed
+Custom Smoothie,3,Smoothies,Watershed
+Chocolate Oatly,3,Ice Cream,Watershed
+Vanilla Coconut Bliss,3,Ice Cream,Watershed
+Chicken Shawarma Bowl,4,Entrées,Watershed
+Zaatar Steelhead Bowl,4,Entrées,Watershed
+Turmeric-Roasted Cauliflower Bowl,4,Entrées,Watershed
+Harissa Tofu Bowl,4,Entrées,Watershed
+Mediterranean Bowl,4,Entrées,Watershed
+Nosh Bowl,4,Entrées,Watershed
+Custom Crafted Bowl,4,Entrées,Watershed
+Leige Waffle Bowl,4,Entrées,Fresh Marketcafé
+Yogurt Bowl,4,Entrées,Fresh Marketcafé
