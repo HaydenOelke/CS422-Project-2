@@ -49,6 +49,32 @@
   </form>
 </div>
 
+<!-- Add Meal Form -->
+<div class="card">
+  <h2>Add a Meal</h2>
+  <form method="POST" action="/meals/add" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+    <div>
+      <label>Meal Name</label>
+      <input type="text" name="meal_name" placeholder="e.g. Cheeseburger" required>
+    </div>
+    <div>
+      <label>Point Value</label>
+      <input type="number" name="point_value" step="0.25" min="0" placeholder="e.g. 7.50" required>
+    </div>
+    <div>
+      <label>Meal Type</label>
+      <input type="text" name="meal_type" placeholder="e.g. Entree, Drink, Snack" required>
+    </div>
+    <div>
+      <label>Dining Hall</label>
+      <input type="text" name="dining_hall" placeholder="e.g. Carson Dining" required>
+    </div>
+    <div style="grid-column:1/-1;">
+      <button type="submit" class="btn btn-primary">Add Meal</button>
+    </div>
+  </form>
+</div>
+
 <!-- Meal List -->
 <div class="card">
   {% if items %}
@@ -79,6 +105,11 @@
             <input type="date" name="purchase_date" aria-label="Purchase Date">
             <button type="submit" class="btn btn-primary btn-sm">+ Add</button>
           </form>
+          <form method="POST" action="/meals/delete">
+            <input type="hidden" name="meal_name"   value="{{ item.meal_name }}">
+            <input type="hidden" name="dining_hall" value="{{ item.dining_hall }}">
+            <button type="submit" class="btn btn-sm" style="background:#fdecea;color:#c0392b;">Delete</button>
+          </form>
         </td>
       </tr>
       {% endfor %}
@@ -89,31 +120,6 @@
   {% endif %}
 </div>
 
-<!-- Add Meal Form -->
-<div class="card">
-  <h2>Add a Meal</h2>
-  <form method="POST" action="/meals/add" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
-    <div>
-      <label>Meal Name</label>
-      <input type="text" name="meal_name" placeholder="e.g. Cheeseburger" required>
-    </div>
-    <div>
-      <label>Point Value</label>
-      <input type="number" name="point_value" step="0.25" min="0" placeholder="e.g. 7.50" required>
-    </div>
-    <div>
-      <label>Meal Type</label>
-      <input type="text" name="meal_type" placeholder="e.g. Entree, Drink, Snack" required>
-    </div>
-    <div>
-      <label>Dining Hall</label>
-      <input type="text" name="dining_hall" placeholder="e.g. Carson Dining" required>
-    </div>
-    <div style="grid-column:1/-1;">
-      <button type="submit" class="btn btn-primary">Add Meal</button>
-    </div>
-  </form>
-</div>
 
 <style>
   /* Match base.html text/number input styling */

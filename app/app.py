@@ -225,6 +225,14 @@ def meal_upload():
     flash(f"Upload complete — {added} meals added/updated, {skipped} rows skipped.", "success")
     return redirect(url_for("settings"))
 
+# ── Delete meal functionality in Browse Meals───────────────────────────────────────────────────────────────
+@app.route("/meals/delete", methods=["POST"])
+def meal_delete():
+    meal_name   = request.form.get("meal_name", "").strip()
+    dining_hall = request.form.get("dining_hall", "").strip()
+    meal_options_col.delete_one({"meal_name": meal_name, "dining_hall": dining_hall})
+    flash(f"{meal_name} removed from meals.", "success")
+    return redirect(url_for("meals"))
 # ── Other pages ───────────────────────────────────────────────────────────────
 
 @app.route("/history")
